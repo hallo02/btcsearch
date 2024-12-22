@@ -4,3 +4,6 @@ node_modules
 wallet.json
 le_addresses.gz
 le_addresses.txt
+addresses.gz
+addresses.txt
+dist

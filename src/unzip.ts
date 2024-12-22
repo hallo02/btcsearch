@@ -1,7 +1,7 @@
 import gunzipFile from "gunzip-file";
 import * as fs from "fs";
 
-function unzip(source, target) {
+function unzip(source: string, target: string) {
     if (process.argv.some(arg => arg.toLocaleLowerCase() === '--skipunzip')) return;
     console.log();
     console.log(`Start unzipping`);

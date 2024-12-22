@@ -1,8 +1,14 @@
 import * as bitcoin from "bitcoinjs-lib";
-import { ECPairFactory } from "ecpair";
+import { ECPairFactory, ECPairInterface } from "ecpair";
 import * as ecc from "tiny-secp256k1";
-import * as fs from "fs";
 import dotenv from 'dotenv';
+
+export interface KeyPackage {
+    privateKey: string,
+    p2pkh?: string,
+    p2sh?: string,
+    p2wpkh?: string,
+}
 
 dotenv.config();
 const ECPair = ECPairFactory(ecc);
@@ -10,7 +16,7 @@ const network = bitcoin.networks.bitcoin; // Otherwise, bitcoin = mainnet and re
 
 export function getVerificationAddress() {
   const keyPair = ECPair.fromWIF(
-    process.env.VERIFICATION_PRIVATE_KEY,
+    process.env.VERIFICATION_PRIVATE_KEY as string,
     network
   );
   return packageKey(keyPair);
@@ -21,7 +27,7 @@ export function getRandomAddresses() {
   return packageKey(keyPair);
 }
 
-function packageKey(keyPair) {
+function packageKey(keyPair: ECPairInterface): KeyPackage {
   const { address: legacyAddress } = bitcoin.payments.p2pkh({
     pubkey: keyPair.publicKey,
   });
