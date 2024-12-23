@@ -1,5 +1,6 @@
 import axios from "axios";
 import * as fs from "fs";
+import sendMessage from "./telegramBot.js";
 
 async function downloadFile(url: string, outputPath: string) {
   if (process.argv.some((arg) => arg.toLocaleLowerCase() === "--skipdownload"))
@@ -34,6 +35,7 @@ async function downloadFile(url: string, outputPath: string) {
     });
   } catch (err: any) {
     console.error("Error downloading file:", err.message);
+    sendMessage(`Error while downloading file: ${err}`);
   }
 }
 

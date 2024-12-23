@@ -1,36 +1,40 @@
 import readline from "readline";
 import fs from "fs";
-import {getVerificationAddress, KeyPackage} from "./addressGen.js";
+import { getVerificationAddress, KeyPackage } from "./addressGen.js";
+import sendMessage from "./telegramBot.js";
 
-function checkForRandomKey(randomKey: KeyPackage, addresses: Set<string>[]) {
-  findAddress(randomKey, addresses);
-}
-
-function findAddress(randomKey: KeyPackage, listOfSets: Set<string>[]) {
+async function checkForRandomKey(randomKey: KeyPackage, listOfSets: Set<string>[]) {
   const { privateKey, p2pkh, p2sh, p2wpkh } = randomKey;
   let setIdx = 0;
   for (const addressSet of listOfSets) {
     if (p2pkh && addressSet.has(p2pkh)) {
-      found("p2pkh", p2pkh, privateKey, randomKey, setIdx);
+      await found("p2pkh", p2pkh, privateKey, randomKey, setIdx);
     }
 
     if (p2sh && addressSet.has(p2sh)) {
-      found("p2sh", p2sh, privateKey, randomKey, setIdx);
+      await found("p2sh", p2sh, privateKey, randomKey, setIdx);
     }
 
     if (p2wpkh && addressSet.has(p2wpkh)) {
-      found("p2wpkh", p2wpkh, privateKey, randomKey, setIdx);
+      await found("p2wpkh", p2wpkh, privateKey, randomKey, setIdx);
     }
     setIdx++;
   }
 }
 
-function found(type: string, address: string, privateKey: string, randomKey: KeyPackage, setIdx: number) {
+async function found(
+  type: string,
+  address: string,
+  privateKey: string,
+  randomKey: KeyPackage,
+  setIdx: number
+) {
   console.log();
   console.log(`Found ${type} ${address} in set number ${setIdx}`);
   console.log(`With PrivateKey: ${privateKey}`);
   console.log(randomKey);
   writeToFile(randomKey);
+  await sendMessage(`CHECK YOUR BOT ${address}`);
 }
 
 function writeToFile(randomKey: KeyPackage) {

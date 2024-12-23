@@ -1,7 +1,6 @@
 import * as bitcoin from "bitcoinjs-lib";
 import { ECPairFactory, ECPairInterface } from "ecpair";
 import * as ecc from "tiny-secp256k1";
-import dotenv from 'dotenv';
 
 export interface KeyPackage {
     privateKey: string,
@@ -10,7 +9,6 @@ export interface KeyPackage {
     p2wpkh?: string,
 }
 
-dotenv.config();
 const ECPair = ECPairFactory(ecc);
 const network = bitcoin.networks.bitcoin; // Otherwise, bitcoin = mainnet and regnet = local
 
