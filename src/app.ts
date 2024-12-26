@@ -23,19 +23,20 @@ async function searchBtc() {
   await unzip(fileCompressed, fileUncompressed);
 
   // Load addesses into memory
-  let addresses = await fileToMemory(fileUncompressed);
+  let addresses: Set<string>[] | null = await fileToMemory(fileUncompressed);
 
   // Lookup loop
   let iteration = 1;
   let newDownloadInterval = 100_000_000;
   let measurementStartFrom = Date.now();
   let measurementInterval = 10_000;
-  
+
   while (true) {
     let randomKey;
 
     // Refresh balanced addresses
     if (iteration % newDownloadInterval === 0) {
+      addresses = null;
       addresses = await downloadAndUnzipAndLoadIntoMemory(
         onlineSource,
         fileCompressed,
