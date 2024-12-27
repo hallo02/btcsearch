@@ -28,6 +28,7 @@ async function searchBtc() {
   // Lookup loop
   let iteration = 1;
   let newDownloadInterval = 100_000_000;
+  let verificationIteration = 100_000;
   let measurementStartFrom = Date.now();
   let measurementInterval = 10_000;
 
@@ -47,7 +48,7 @@ async function searchBtc() {
     // Bring in verification address
     // Expectation is to find a match using this Random Key.
     // This is real money on the blockchain and verifies app functionality.
-    if (iteration === measurementInterval * 10) {
+    if (iteration === verificationIteration) {
       randomKey = getVerificationAddress();
       console.log(
         "\nKey for functionality verification, so don't hype. But this is actual money on the address, please let it there."
