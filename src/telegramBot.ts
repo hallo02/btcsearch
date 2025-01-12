@@ -4,7 +4,7 @@ let botToken: string;
 let chatId: string;
 let bot: TelegramBot;
 
-export function initBot() {
+export function initTelegramBot() {
   botToken = process.env.TELEGRAM_BOT_TOKEN as string;
   chatId = process.env.TELEGRAM_CHAT_ID as string;
   bot = new TelegramBot(botToken);

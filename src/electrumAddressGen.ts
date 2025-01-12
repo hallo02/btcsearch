@@ -3,7 +3,7 @@ import * as ecc from "tiny-secp256k1";
 import { BIP32Factory } from "bip32";
 import * as bitcoin from "bitcoinjs-lib";
 import { createHash, pbkdf2Sync } from "crypto";
-import { KeyPackage } from "./addressGen.js";
+import KeyPackage from "./model.js";
 
 // bip32 und tiny-secp256k1 initialisieren
 const bip32 = BIP32Factory(ecc);
@@ -22,12 +22,13 @@ enum AddressType {
 export default function generateKeyPackages(size: number = 20): KeyPackage[] {
   let mnemonic = generateRandomMnemonic();
 
-  let v1 = generateNReceivingAdresses(Math.floor(size / 2), mnemonic);
-  let v2 = generateNChangeAddresses(Math.floor(size / 2), mnemonic);
+  let addresses = generateNReceivingAdresses(Math.floor(size / 2), mnemonic);
+  addresses.push(...generateNChangeAddresses(Math.floor(size / 2), mnemonic));
 
-  v1.push(...v2);
-  return v1;
+  return addresses;
 }
+
+// check bc1qrk0xnzlcm5tk508rpfdx7tggcgswzw98tkhm7v
 
 function generateNReceivingAdresses(
   n: number,
@@ -74,14 +75,9 @@ function generateElectrumAddresses(
 
   // Master-Node (Root Key)
   const rootNode = generateElectrumMasterKey(normalizedMnemonic);
-  //   console.log(
-  //     `Fingerprint root: ${Buffer.from(rootNode.fingerprint).toString("hex")}`
-  //   );
-
-  // Ableitung des Node basierend auf dem angegebenen Ableitungspfad
   const hardenedNode = rootNode.deriveHardened(0); // m/0h
 
-  // Empfangsadresse (m/0h/0/n) - Receiving Addresses
+  // (m/0h/0/n) - Receiving Addresses
   const receivingNode = hardenedNode.derive(incomingAddressType); // Externe Adressen
 
   const result: KeyPackage[] = [];

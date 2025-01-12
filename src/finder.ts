@@ -1,7 +1,8 @@
 import readline from "readline";
 import fs from "fs";
-import { getVerificationAddress, KeyPackage } from "./addressGen.js";
+import { getVerificationAddress } from "./addressGen.js";
 import sendMessage from "./telegramBot.js";
+import KeyPackage from "./model.js";
 
 async function checkForRandomKey(
   randomKeys: KeyPackage[],

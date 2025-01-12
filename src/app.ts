@@ -3,9 +3,9 @@ import { getRandomAddresses, getVerificationAddress } from "./addressGen.js";
 import checkForRandomKey from "./finder.js";
 import fileToMemory from "./fileToMemory.js";
 import downloadFile from "./downloadFile.js";
-import sendMessage, { initBot } from "./telegramBot.js";
+import sendMessage, { initTelegramBot } from "./telegramBot.js";
 import dotenv from "dotenv";
-import generateKeyPackages from "./electrum.js";
+import generateKeyPackages from "./electrumAddressGen.js";
 
 dotenv.config();
 const onlineSource =
@@ -15,7 +15,7 @@ const fileUncompressed = "addresses.txt";
 
 async function searchBtc() {
   // Init telegram bot
-  initBot();
+  initTelegramBot();
   await sendMessage(`BTCSEARCH STARTED`);
 
   // Init download
@@ -25,7 +25,7 @@ async function searchBtc() {
   await unzip(fileCompressed, fileUncompressed);
 
   // Load addesses into memory
-  let addresses: Set<string>[] | null = await fileToMemory(fileUncompressed);
+  let utxo: Set<string>[] | null = await fileToMemory(fileUncompressed);
 
   // Lookup loop
   let iteration = 1;
@@ -36,12 +36,11 @@ async function searchBtc() {
   let measurementInterval = 1_000;
 
   while (true) {
-    let randomKey;
 
-    // Refresh balanced addresses
+    // Refresh balanced addresses memory
     if (iteration % newDownloadInterval === 0) {
-      addresses = null;
-      addresses = await downloadAndUnzipAndLoadIntoMemory(
+      utxo = null;
+      utxo = await downloadAndUnzipAndLoadIntoMemory(
         onlineSource,
         fileCompressed,
         fileUncompressed
@@ -49,8 +48,9 @@ async function searchBtc() {
     }
 
     // Bring in verification address
-    // Expectation is to find a match using this Random Key.
+    // Expectation is to find a match using the verification address.
     // This is real money on the blockchain and verifies app functionality.
+    let randomKey;
     if (iteration === verificationIteration) {
       randomKey = getVerificationAddress();
       console.log(
@@ -61,7 +61,7 @@ async function searchBtc() {
       randomKey = generateKeyPackages(hdWalletDerivationDepth);
     }
 
-    await checkForRandomKey(randomKey, addresses);
+    await checkForRandomKey(randomKey, utxo);
 
     // App performance monitor
     if (iteration % measurementInterval === 0) {

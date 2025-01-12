@@ -1,14 +1,7 @@
 import * as bitcoin from "bitcoinjs-lib";
 import { ECPairFactory, ECPairInterface } from "ecpair";
 import * as ecc from "tiny-secp256k1";
-
-export interface KeyPackage {
-    privateKey: string,
-    mnemonic?: string,
-    p2pkh?: string,
-    p2sh?: string,
-    p2wpkh?: string,
-}
+import KeyPackage from "./model.js";
 
 const ECPair = ECPairFactory(ecc);
 const network = bitcoin.networks.bitcoin; // Otherwise, bitcoin = mainnet and regnet = local
