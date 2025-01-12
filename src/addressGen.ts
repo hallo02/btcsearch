@@ -4,6 +4,7 @@ import * as ecc from "tiny-secp256k1";
 
 export interface KeyPackage {
     privateKey: string,
+    mnemonic?: string,
     p2pkh?: string,
     p2sh?: string,
     p2wpkh?: string,
@@ -12,17 +13,17 @@ export interface KeyPackage {
 const ECPair = ECPairFactory(ecc);
 const network = bitcoin.networks.bitcoin; // Otherwise, bitcoin = mainnet and regnet = local
 
-export function getVerificationAddress() {
+export function getVerificationAddress(): KeyPackage[] {
   const keyPair = ECPair.fromWIF(
     process.env.VERIFICATION_PRIVATE_KEY as string,
     network
   );
-  return packageKey(keyPair);
+  return [packageKey(keyPair)];
 }
 
-export function getRandomAddresses() {
+export function getRandomAddresses(): KeyPackage[] {
   const keyPair = ECPair.makeRandom();
-  return packageKey(keyPair);
+  return [packageKey(keyPair)];
 }
 
 function packageKey(keyPair: ECPairInterface): KeyPackage {

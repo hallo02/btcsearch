@@ -5,6 +5,8 @@ import fileToMemory from "./fileToMemory.js";
 import downloadFile from "./downloadFile.js";
 import sendMessage, { initBot } from "./telegramBot.js";
 import dotenv from "dotenv";
+import generateKeyPackages from "./electrum.js";
+
 dotenv.config();
 const onlineSource =
   "http://addresses.loyce.club/Bitcoin_addresses_LATEST.txt.gz";
@@ -14,7 +16,7 @@ const fileUncompressed = "addresses.txt";
 async function searchBtc() {
   // Init telegram bot
   initBot();
-  sendMessage(`BTCSEARCH STARTED`);
+  await sendMessage(`BTCSEARCH STARTED`);
 
   // Init download
   await downloadFile(onlineSource, fileCompressed);
@@ -27,10 +29,11 @@ async function searchBtc() {
 
   // Lookup loop
   let iteration = 1;
-  let newDownloadInterval = 100_000_000;
-  let verificationIteration = 100_000;
+  let newDownloadInterval = 5_000_000;
+  let verificationIteration = 1_000;
   let measurementStartFrom = Date.now();
-  let measurementInterval = 10_000;
+  let hdWalletDerivationDepth = 20;
+  let measurementInterval = 1_000;
 
   while (true) {
     let randomKey;
@@ -55,7 +58,7 @@ async function searchBtc() {
       );
       console.log(randomKey);
     } else {
-      randomKey = getRandomAddresses();
+      randomKey = generateKeyPackages(hdWalletDerivationDepth);
     }
 
     await checkForRandomKey(randomKey, addresses);
@@ -65,8 +68,8 @@ async function searchBtc() {
       let elapsedMs = Date.now() - measurementStartFrom;
 
       process.stdout.write(
-        `\rAt iteration ${iteration}, current speed: ${(
-          (measurementInterval / elapsedMs) *
+        `\rAt iteration ${iteration} (x${hdWalletDerivationDepth}), current speed: ${(
+          ((measurementInterval * hdWalletDerivationDepth) / elapsedMs) *
           1000
         ).toFixed(1)}/s`
       );
